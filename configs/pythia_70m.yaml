@@ -1,0 +1,38 @@
+model:
+  type: pythia
+  name: Pythia-70M
+  hf_name: EleutherAI/pythia-70m
+
+training:
+  batch_size: 16
+  grad_accum: 1
+  max_steps: 20000
+  lr: 1e-3
+  warmup_steps: 500
+  weight_decay: 0.01
+  grad_clip: 1.0
+  bf16: true
+  attn_impl: sdpa  # flash_attn may not be installed
+  log_freq: 50
+  save_every: 5000
+
+optimizer:
+  name: adaptive_rank_muon
+  momentum: 0.9
+  rms_scale: 0.04
+  rho0: 0.15
+  rho_min: 0.0625
+  rho_max: 0.6
+  xi_thresh: 0.15
+  delta_rho: 0.005
+  beta3: 0.9
+  adapt_freq: 10
+  ns_iters: 5
+
+data:
+  path: /media/nas_mount/ramish/btp_report/owt_pythia_packed_2048
+  seq_len: 2048
+  num_workers: 0  # NFS: avoid temp file cleanup issues
+
+output:
+  save_dir: results/Pythia-70M_{optimizer.name}
