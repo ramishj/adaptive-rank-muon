@@ -90,9 +90,9 @@ class Trainer:
         train_cfg = config["training"]
         opt_cfg = config["optimizer"]
 
-        self.max_steps = train_cfg["max_steps"]
-        self.lr = train_cfg["lr"]
-        self.warmup_steps = train_cfg["warmup_steps"]
+        self.max_steps = int(train_cfg["max_steps"])
+        self.lr = float(train_cfg["lr"])
+        self.warmup_steps = int(train_cfg["warmup_steps"])
         self.grad_accum = train_cfg.get("grad_accum", 1)
         self.grad_clip = train_cfg.get("grad_clip", 1.0)
         self.use_bf16 = train_cfg.get("bf16", True)
@@ -112,7 +112,7 @@ class Trainer:
             return torch.optim.AdamW(
                 self.model.parameters(),
                 lr=self.lr,
-                weight_decay=self.config["training"].get("weight_decay", 0.01),
+                weight_decay=float(self.config["training"].get("weight_decay", 0.01)),
             )
 
         # Split params: embed/norm/bias → AdamW, rest → Muon variant
@@ -137,16 +137,16 @@ class Trainer:
             opt_muon = AdaptiveRankMuon(
                 muon_params, lr=self.lr,
                 momentum=opt_cfg.get("momentum", 0.9),
-                weight_decay=self.config["training"].get("weight_decay", 0.0),
-                ns_iters=opt_cfg.get("ns_iters", 5),
-                rms_scale=opt_cfg.get("rms_scale", 0.04),
-                rho0=opt_cfg.get("rho0", 0.15),
-                rho_min=opt_cfg.get("rho_min", 0.0625),
-                rho_max=opt_cfg.get("rho_max", 0.6),
-                xi_thresh=opt_cfg.get("xi_thresh", 0.15),
-                delta_rho=opt_cfg.get("delta_rho", 0.005),
-                beta3=opt_cfg.get("beta3", 0.9),
-                adapt_freq=opt_cfg.get("adapt_freq", 10),
+                weight_decay=float(self.config["training"].get("weight_decay", 0.0)),
+                ns_iters=int(opt_cfg.get("ns_iters", 5)),
+                rms_scale=float(opt_cfg.get("rms_scale", 0.04)),
+                rho0=float(opt_cfg.get("rho0", 0.15)),
+                rho_min=float(opt_cfg.get("rho_min", 0.0625)),
+                rho_max=float(opt_cfg.get("rho_max", 0.6)),
+                xi_thresh=float(opt_cfg.get("xi_thresh", 0.15)),
+                delta_rho=float(opt_cfg.get("delta_rho", 0.005)),
+                beta3=float(opt_cfg.get("beta3", 0.9)),
+                adapt_freq=int(opt_cfg.get("adapt_freq", 10)),
             )
         elif name == "muon_fixed":
             opt_muon = MuonSimple(
